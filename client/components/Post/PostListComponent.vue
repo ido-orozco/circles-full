@@ -19,7 +19,7 @@ async function getPosts(author?: string) {
   let query: Record<string, string> = author !== undefined ? { author } : {};
   let postResults;
   try {
-    postResults = await fetchy("/api/posts", "GET", { query });
+    postResults = await fetchy(`/api/posts`, "GET", { query });
   } catch (_) {
     return;
   }

@@ -18,6 +18,16 @@ export default class CirclesConcept {
   public readonly circles = new DocCollection<CirclesDoc>("circles");
   public readonly circleUsers = new DocCollection<CirclesUsersDoc>("circlesUsers");
 
+  async getCircles(user: ObjectId) {
+    const circles = await this.circles.readMany({ user });
+    return circles;
+  }
+
+  async getCircle(_id: ObjectId) {
+    const circle = await this.circles.readOne({ _id });
+    return circle;
+  }
+
   async createCircle(user: ObjectId, name: string, description?: string) {
     const _id = await this.circles.createOne({ user, name, description });
     return { msg: "Circle created successfully!", circle: await this.circles.readOne({ _id }) };

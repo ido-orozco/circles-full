@@ -182,10 +182,21 @@ class Routes {
     return await Friend.rejectRequest(fromId, user);
   }
 
+  @Router.get("/circles")
+  async getCircles(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    return await Circles.getCircles(user);
+  }
+
   @Router.post("/circles")
   async createCircle(session: WebSessionDoc, name: string, description?: string) {
     const user = WebSession.getUser(session);
     return await Circles.createCircle(user, name, description);
+  }
+
+  @Router.get("/circle/:_id")
+  async getCircle(_id: ObjectId) {
+    return await Circles.getCircle(_id);
   }
 
   @Router.patch("/circles/:_id")

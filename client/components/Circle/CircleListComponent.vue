@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import CirclesAddForm from "./CirclesAddForm.vue";
 
 const loaded = ref(false);
 let circles = ref<Array<Record<string, string>>>([]);
@@ -31,6 +32,7 @@ onBeforeMount(async () => {
   </section>
   <p v-else-if="loaded">No circles found</p>
   <p v-else>Loading...</p>
+  <CirclesAddForm @refreshCircles="getCircles()" />
 </template>
 
 <style scoped>

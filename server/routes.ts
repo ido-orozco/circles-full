@@ -213,25 +213,28 @@ class Routes {
     return await Circles.deleteCircle(_id);
   }
 
-  @Router.post("/circles/:_id/:user")
-  async addUserToCircle(session: WebSessionDoc, _id: ObjectId, user: ObjectId) {
+  @Router.post("/circles/:_id/:username")
+  async addUserToCircle(session: WebSessionDoc, _id: ObjectId, username: string) {
     const owner = WebSession.getUser(session);
     await Circles.isOwner(owner, _id);
-    return await Circles.addUserToCircle(user, _id);
+    const userId = (await User.getUserByUsername(username))._id;
+    return await Circles.addUserToCircle(userId, _id);
   }
 
-  @Router.delete("/circles/:_id/:user")
-  async deleteUserInCircle(session: WebSessionDoc, _id: ObjectId, user: ObjectId) {
+  @Router.delete("/circles/:_id/:username")
+  async deleteUserInCircle(session: WebSessionDoc, _id: ObjectId, username: string) {
     const owner = WebSession.getUser(session);
     await Circles.isOwner(owner, _id);
-    return await Circles.removeUserFromCircle(user, _id);
+    const userId = (await User.getUserByUsername(username))._id;
+    return await Circles.removeUserFromCircle(userId, _id);
   }
 
-  @Router.get("/circles/:_id")
+  @Router.get("/circles/:_id/users")
   async getUsersInCircle(session: WebSessionDoc, _id: ObjectId) {
     const owner = WebSession.getUser(session);
     await Circles.isOwner(owner, _id);
-    return await Circles.getCircleUsers(_id);
+    const userIds = await Circles.getCircleUsers(_id);
+    return await User.idsToUsernames(userIds);
   }
 
   @Router.get("/feed")

@@ -18,35 +18,41 @@ export default class CirclesConcept {
   public readonly circles = new DocCollection<CirclesDoc>("circles");
   public readonly circleUsers = new DocCollection<CirclesUsersDoc>("circlesUsers");
 
+  // All Circles for a certain user
   async getCircles(user: ObjectId) {
     const circles = await this.circles.readMany({ user });
     return circles;
   }
 
+  // Return the info on a Circle
   async getCircle(_id: ObjectId) {
     const circle = await this.circles.readOne({ _id });
     return circle;
   }
 
+  // Create
   async createCircle(user: ObjectId, name: string, description?: string) {
     const _id = await this.circles.createOne({ user, name, description });
     return { msg: "Circle created successfully!", circle: await this.circles.readOne({ _id }) };
   }
 
+  // Change Name
   async updateCircle(_id: ObjectId, update: Partial<CirclesDoc>) {
     this.sanitizeUpdate(update);
     await this.circles.updateOne({ _id }, update);
     return { msg: "Circle updated!" };
   }
 
+  // Delete
   async deleteCircle(_id: ObjectId) {
     void this.circles.deleteOne({ _id });
     void this.circleUsers.deleteMany({ circle: _id });
     return { msg: "Deleted Circle" };
   }
 
+  // Add a user to a circle
   async addUserToCircle(user: ObjectId, circle: ObjectId) {
-    let circleExists = await this.circles.readOne({ circle });
+    let circleExists = await this.circles.readOne({ _id: circle });
     if (circleExists) {
       let userinCircle = await this.circleUsers.readOne({ user, circle });
 
@@ -60,6 +66,7 @@ export default class CirclesConcept {
     throw new Error("Circle does not exist");
   }
 
+  // Remove
   async removeUserFromCircle(user: ObjectId, circle: ObjectId) {
     let circleExists = await this.circles.readOne({ circle });
     if (circleExists) {
@@ -74,12 +81,13 @@ export default class CirclesConcept {
     throw new Error("Circle does not exist");
   }
 
+  // Get all the users in a circle
   async getCircleUsers(circle: ObjectId) {
-    let circleExists = await this.circles.readOne({ circle });
+    let circleExists = await this.circles.readOne({ _id: circle });
     if (circleExists) {
       let users = await this.circleUsers.readMany({ circle });
       let userIds: Array<ObjectId> = [];
-      users.forEach((user) => userIds.push(user._id));
+      users.forEach((user) => userIds.push(user.user));
       return userIds;
     }
     throw new Error("Circle does not exist");

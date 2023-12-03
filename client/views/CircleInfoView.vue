@@ -6,29 +6,21 @@ import UserListComponent from "../components/CircleInfo/UserListComponent.vue";
 import { fetchy } from "../utils/fetchy";
 
 let circle = ref();
-const loaded = ref(false);
-const _id = useRoute().params.circle;
+const circleId = useRoute().params.circle;
 
 const getCircle = async () => {
-  circle.value = await fetchy(`/api/circle/${_id}`, "GET");
+  circle.value = await fetchy(`/api/circle/${circleId}`, "GET");
 };
 
 onBeforeMount(async () => {
   await getCircle();
-  loaded.value = true;
 });
 </script>
 
 <template>
-  <main>
-    <h1 v-if="loaded">{{ circle.name }}</h1>
-    <CircleUpdateForm />
-    <UserListComponent />
+  <main class="column">
+    <h1>{{ circle.name }}</h1>
+    <CircleUpdateForm :circle="circle" @refreshCircle="getCircle" />
+    <UserListComponent :circle="circle" />
   </main>
 </template>
-
-<style scoped>
-h1 {
-  text-align: center;
-}
-</style>

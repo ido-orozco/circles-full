@@ -37,19 +37,18 @@ onBeforeMount(async () => {
   <section v-if="isLoggedIn">
     <h2>Create a post:</h2>
     <CreatePostForm @refreshPosts="getFeed" />
-
-    <div class="row">
-      <h2>Your Feed:</h2>
-    </div>
-    <section class="posts" v-if="loaded && posts.length !== 0">
-      <article v-for="post in posts" :key="post._id">
-        <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getFeed" @editPost="updateEditing" />
-        <EditPostForm v-else :post="post" @refreshPosts="getFeed" @editPost="updateEditing" />
-      </article>
-    </section>
-    <p v-else-if="loaded">No posts found</p>
-    <p v-else>Loading...</p>
   </section>
+  <div class="row">
+    <h2>Your Feed:</h2>
+  </div>
+  <section class="posts" v-if="loaded && posts.length !== 0">
+    <article v-for="post in posts" :key="post._id">
+      <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getFeed" @editPost="updateEditing" />
+      <EditPostForm v-else :post="post" @refreshPosts="getFeed" @editPost="updateEditing" />
+    </article>
+  </section>
+  <p v-else-if="loaded">No posts found</p>
+  <p v-else>Loading...</p>
 </template>
 
 <style scoped>

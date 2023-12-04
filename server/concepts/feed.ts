@@ -12,8 +12,8 @@ export default class FeedConcept {
   public readonly feeds = new DocCollection<FeedDoc>("feed");
 
   async publish(users: ObjectId[], post: ObjectId) {
-    users.forEach((user) => {
-      void this.feeds.createOne({ user, post });
+    users.forEach(async (user) => {
+      await this.feeds.createOne({ user: user, post: post });
     });
   }
 
@@ -22,10 +22,11 @@ export default class FeedConcept {
   }
 
   async getFeed(user: ObjectId) {
-    const postEntry = await this.feeds.readMany({ user });
+    const postEntry = await this.feeds.readMany({ user: user });
     let allPosts: Array<ObjectId> = [];
     postEntry.forEach(async (doc) => {
       if (doc) allPosts.push(doc.post);
     });
+    return allPosts;
   }
 }

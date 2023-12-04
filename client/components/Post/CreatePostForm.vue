@@ -3,12 +3,19 @@ import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const content = ref("");
+const circles = ref("");
 const emit = defineEmits(["refreshPosts"]);
 
-const createPost = async (content: string) => {
+const createPost = async (content: string, circles: string) => {
+  //Formatting Circles correctly
+  const circleNames = circles.split(",");
+
   try {
     await fetchy(`/api/posts`, "POST", {
-      body: { content },
+      body: {
+        content: content,
+        circles: circleNames,
+      },
     });
   } catch (_) {
     return;
@@ -19,13 +26,15 @@ const createPost = async (content: string) => {
 
 const emptyForm = () => {
   content.value = "";
+  circles.value = "";
 };
 </script>
 
 <template>
-  <form @submit.prevent="createPost(content)">
+  <form @submit.prevent="createPost(content, circles)">
     <label for="content">Post Contents:</label>
-    <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
+    <textarea class="cont" id="content" v-model="content" placeholder="Create a post!" required> </textarea>
+    <textarea class="circle" id="circles" v-model="circles" placeholder="List all Circles to post to, separated by commas (no extra whitespace plz)" required> </textarea>
     <button type="submit" class="pure-button-primary pure-button">Create Post</button>
   </form>
 </template>
@@ -40,10 +49,18 @@ form {
   padding: 1em;
 }
 
-textarea {
+.cont {
   font-family: inherit;
   font-size: inherit;
   height: 6em;
+  padding: 0.5em;
+  border-radius: 4px;
+  resize: none;
+}
+.circle {
+  font-family: inherit;
+  font-size: inherit;
+  height: 2em;
   padding: 0.5em;
   border-radius: 4px;
   resize: none;

@@ -16,6 +16,10 @@ export default class PostConcept {
     return { msg: "Post successfully created!", post: await this.posts.readOne({ _id }) };
   }
 
+  async getPost(_id: ObjectId) {
+    return await this.posts.readOne({ _id: _id });
+  }
+
   async getPosts(query: Filter<PostDoc>) {
     const posts = await this.posts.readMany(query, {
       sort: { dateUpdated: -1 },

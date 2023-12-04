@@ -24,6 +24,16 @@ export default class CirclesConcept {
     return circles;
   }
 
+  async getCircleFromName(user: ObjectId, circle: string) {
+    const circleFull = await this.circles.readOne({
+      user: user,
+      name: circle,
+    });
+    if (!circleFull) {
+      throw new Error(`Circle ${circle} does not exist`);
+    }
+    return circleFull;
+  }
   // Return the info on a Circle
   async getCircle(_id: ObjectId) {
     const circle = await this.circles.readOne({ _id });
@@ -54,7 +64,7 @@ export default class CirclesConcept {
   async addUserToCircle(user: ObjectId, circle: ObjectId) {
     let circleExists = await this.circles.readOne({ _id: circle });
     if (circleExists) {
-      let userinCircle = await this.circleUsers.readOne({ user, circle });
+      let userinCircle = await this.circleUsers.readOne({ user: user, circle: circle });
 
       if (userinCircle) {
         return { msg: "User already in circle" };
@@ -85,7 +95,7 @@ export default class CirclesConcept {
   async getCircleUsers(circle: ObjectId) {
     let circleExists = await this.circles.readOne({ _id: circle });
     if (circleExists) {
-      let users = await this.circleUsers.readMany({ circle });
+      let users = await this.circleUsers.readMany({ circle: circle });
       let userIds: Array<ObjectId> = [];
       users.forEach((user) => userIds.push(user.user));
       return userIds;

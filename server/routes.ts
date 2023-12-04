@@ -58,6 +58,24 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
+  @Router.get("/feed")
+  async getFeed(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const postIds = await Feed.getFeed(user);
+    const allPostDocs: PostDoc[] = [];
+    postIds.forEach(async (postId) => {
+      const post = await Post.getPost(postId);
+      if (post) allPostDocs.push(post);
+    });
+    return Responses.posts(allPostDocs);
+  }
+
+  @Router.patch("/feed/:post")
+  async viewPost(session: WebSessionDoc, post: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Feed.viewPost(user, post);
+  }
+
   @Router.get("/posts")
   async getPosts(author?: string) {
     let posts;
@@ -71,21 +89,25 @@ class Routes {
   }
 
   @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, circles: ObjectId[]) {
+  async createPost(session: WebSessionDoc, content: string, circles: string[]) {
     const user = WebSession.getUser(session);
-    // Create Post
-    const created = await Post.create(user, content);
 
-    // Get all users in the Circles posting to
-    let allUsers: Array<ObjectId> = [];
-    circles.forEach(async (circleId) => {
-      const userIds = await Circles.getCircleUsers(circleId);
+    // Get all users in the Circles posting to, as well as self
+    let allUsers: Array<ObjectId> = [user];
+    circles.forEach(async (circleName) => {
+      const circle = await Circles.getCircleFromName(user, circleName);
+      const userIds = await Circles.getCircleUsers(circle._id);
       allUsers = allUsers.concat(userIds);
     });
 
+    // Create Post
+    const created = await Post.create(user, content);
+
     // Publish to those users
     const post = created.post;
-    if (post) await Feed.publish(allUsers, post._id);
+    if (post) {
+      await Feed.publish(allUsers, post._id);
+    }
     return { msg: created.msg, post: await Responses.post(created.post) };
   }
 
@@ -235,18 +257,6 @@ class Routes {
     await Circles.isOwner(owner, _id);
     const userIds = await Circles.getCircleUsers(_id);
     return await User.idsToUsernames(userIds);
-  }
-
-  @Router.get("/feed")
-  async getFeed(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
-    return await Feed.getFeed(user);
-  }
-
-  @Router.patch("/feed/:post")
-  async viewPost(session: WebSessionDoc, post: ObjectId) {
-    const user = WebSession.getUser(session);
-    return await Feed.viewPost(user, post);
   }
 }
 

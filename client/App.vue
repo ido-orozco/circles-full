@@ -25,7 +25,6 @@ onBeforeMount(async () => {
   <header>
     <nav>
       <div class="title">
-        <img src="@/assets/images/logo.svg" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Circles</h1>
         </RouterLink>
@@ -57,9 +56,11 @@ onBeforeMount(async () => {
 
 nav {
   padding: 1em 2em;
-  background-color: lightgray;
+  background-color: rgb(179, 131, 219);
+  color: antiquewhite;
   display: flex;
   align-items: center;
+  box-shadow: 0 4px 2px -2px rgb(151, 151, 151);
 }
 
 h1 {
